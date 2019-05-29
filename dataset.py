@@ -63,9 +63,15 @@ class Dataset(object):
                 if not dicom_data or 'pixel_data' not in dicom_data:
                     continue
                 dicom_image = dicom_data['pixel_data']
-                new_data = DataPoint(dicom_file, contour_file, dicom_image,
-                                     parsing.poly_to_mask(contour_list, dicom_image.shape[1],
-                                                          dicom_image.shape[0]))
+                
+                try:
+                    mask = parsing.poly_to_mask(contour_list, dicom_image.shape[1],
+                                                dicom_image.shape[0])
+                except parsing.MaskConversionError:
+                    mask = None
+                if mask is None:
+                    continue
+                new_data = DataPoint(dicom_file, contour_file, dicom_image, mask)
                 if new_data.is_valid():
                     self._data_points.append(new_data)
                 

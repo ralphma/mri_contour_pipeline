@@ -58,6 +58,9 @@ def parse_dicom_file(filename):
     except InvalidDicomError:
         return None
 
+class MaskConversionError(Exception):
+    def __init__(self, error_msg):
+        self.error_msg = error_msg
 
 def poly_to_mask(polygon, width, height):
     """Convert polygon to mask
@@ -67,12 +70,16 @@ def poly_to_mask(polygon, width, height):
     :param width: scalar image width
     :param height: scalar image height
     :return: Boolean mask of shape (height, width)
+    :raise: MaskConversionError if conversion from polygon to mask is not possible.
     """
 
     # http://stackoverflow.com/a/3732128/1410871
     img = Image.new(mode='L', size=(width, height), color=0)
-    if len(polygon) < 2:
-        return np.zeros((height, width)).astype(bool)
+    if len(polygon) <= 2:
+        raise MaskConversionError("Polygon needs more than two points")
+    for x,y in polygon:
+        if x >= width or x < 0 or y >= height or y < 0:
+            raise MaskConversionError("Vertex detected outside designed width height")
     ImageDraw.Draw(img).polygon(xy=polygon, outline=0, fill=1)
     mask = np.array(img).astype(bool)
     return mask

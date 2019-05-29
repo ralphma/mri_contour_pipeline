@@ -21,14 +21,15 @@ class TestDicomParsing(object):
         
 class TestPolyToMask(object):
     def test_less_than_two(self):
-        """Tests an all False map is returned when there are only two vertices."""
-        test_rect = parsing.poly_to_mask([(3,0)], width=4, height=4)
-        expected = np.array([[False, False, False, False], 
-                             [False, False, False, False], 
-                             [False, False, False, False],
-                             [False, False, False, False]])        
-        assert np.array_equal(test_rect, expected)
-        
+        """Tests an all False map is returned when there is only 1 vertex."""
+        with pytest.raises(parsing.MaskConversionError):
+            test_rect = parsing.poly_to_mask([(3,0)], width=4, height=4)      
+ 
+    def test_polygon_out_of_bound(self):
+        """Tests an all False map is returned when there is only 1 vertex."""
+        with pytest.raises(parsing.MaskConversionError):
+            test_rect = parsing.poly_to_mask([(0,0), (1,1), (3,0)], width=2, height=2)   
+            
     def test_triangle(self):
         """Tests the inside of a triangle is marked with True."""
         test_rect = parsing.poly_to_mask([(0,0), (3,0), (0,3)], width=4, height=4)
