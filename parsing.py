@@ -14,7 +14,6 @@ def parse_contour_file(filename):
     :param filename: filepath to the contourfile to parse
     :return: list of tuples holding x, y coordinates of the contour
     """
-
     coords_lst = []
     if not os.path.isfile(filename):
         return None

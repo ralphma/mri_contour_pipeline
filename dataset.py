@@ -19,8 +19,12 @@ class DataPoint(object):
         self.contour_path = contour_path
         self.dicom_image = dicom_image
         self.contour_image = contour_image   
+    
+    def is_valid(self):
+        """Placeholder validate function for subclasses to override."""
+        return True
 
-"""Represents a dataset determined by a 'link.csv' file. Can be iterated over and over."""
+"""Represents a dataset determined by a 'link.csv' file. Can be iterated indefinitely."""
 class Dataset(object):   
     def __init__(self, shuffle_data, return_indefinitely):
         self._data_points = []
@@ -47,23 +51,27 @@ class Dataset(object):
             dicom_id = util.extract_dicom_id_from_dicom_filepath(dicom_file)
             if dicom_id == -1:
                 continue
+                
+            # Check if there is a matching contour file with the dicom id.
+            # Create a datapoint if there is.
             if dicom_id in dicom_id_to_contour_file:
                 contour_file = dicom_id_to_contour_file[dicom_id]
                 contour_list = parsing.parse_contour_file(contour_file)
                 if not contour_list:
                     continue
                 dicom_data = parsing.parse_dicom_file(dicom_file)
-                if not dicom_data:
+                if not dicom_data or 'pixel_data' not in dicom_data:
                     continue
                 dicom_image = dicom_data['pixel_data']
                 new_data = DataPoint(dicom_file, contour_file, dicom_image,
                                      parsing.poly_to_mask(contour_list, dicom_image.shape[1],
                                                           dicom_image.shape[0]))
-                self._data_points.append(new_data)
+                if new_data.is_valid():
+                    self._data_points.append(new_data)
                 
     
     def parse_from_csv(self, link_csv, dicom_dir, contour_dir):
-        """Parses a dataset by matching dicom files to contour files
+        """Parses a dataset by matching dicom files to contour files.
         
         :param link_csv: filepath of csv that matches patient_id to original_id.
         :param dicom_dir: directory of all dicom files.
@@ -78,7 +86,11 @@ class Dataset(object):
             if not all_dicom_files or not all_contour_files:
                 continue
             self._add_datapoints_for_patient(all_dicom_files, all_contour_files)
-
+    
+    def size(self):
+        """Returns size of the dataset."""
+        return len(self._data_points)
+    
     def _shuffle(self):
         """Shuffles the data points."""
         random.shuffle(self._data_points)
@@ -95,7 +107,11 @@ class Dataset(object):
         return self
     
     def __next__(self):
-        """Iterates infinitely unless there are no data points."""
+        """Iterates through the dataset.
+        
+        Will iterate indefinitely if return_indefinitely is True. Will shuffle
+        every epoch is shuffle_data is true.
+        """
         if not self._data_points:
             raise StopIteration
         if self._count == len(self._data_points):

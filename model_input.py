@@ -2,11 +2,6 @@ import numpy as np
 
 import parsing
 
-"""An error is raised when the ModelInput is passed a dataset with datapoints that cannot be accessed."""
-class DatasetError(Exception):
-    def __init__(self, error_msg):
-        self.error_msg = error_msg
-        
 class ModelInput(object):
     def __init__(self, dataset, batch_size):
         self._dataset_iter = iter(dataset)
