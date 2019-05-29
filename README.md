@@ -20,7 +20,7 @@ x, y = input_runner.get_input()
 
 I included the python notebook `dicom_image_pipeline_exploration.ipynb` which shows all pytests passing, loading of the data, and visualization of sample batches.
 
-To test run `pytest -v` from main directory.
+To test, run `pytest -v` from main directory.
 
 
 ## Part 1 ##
@@ -32,7 +32,7 @@ A possible next step would be to add data validation tests that make sure the co
 ### What changes did you make to the code, if any, in order to integrate it into our production code base? ###
 For the parsing code, I changed very little. I added checks for existence of files being passed into `parse_contour_file` and `parse_dicom_file`. As for `poly_to_mask`, I added some checks for the validity of the polygon. If the polygon is not valid, an MaskConversionError is thrown.
 
-For the matching of dicom and contour files, I created the Dataset class which handles parsing from a link csv (see usage above). It stores the data as `DataPoint` which has matching dicom path, contour path and the processed images. To make sure the module work, I created unit tests using pytest to test the component.
+For the matching of dicom and contour files, I created the `Dataset` class which handles parsing from a link csv (see usage above). It stores the data as `DataPoint` which has matching dicom path, contour path and the processed images. To make sure the module work, I created unit tests using pytest to test the component.
 
 ## Part 2 ##
 ### Did you change anything from the pipelines built in Parts 1 to better streamline the pipeline built in Part 2? If so, what? If not, is there anything that you can imagine changing in the future? ###
