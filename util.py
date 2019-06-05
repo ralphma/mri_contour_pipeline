@@ -2,7 +2,7 @@ import os
 import re
 
 _DICOM_FILE_ID_EXTRACTION_RE = "(?P<id>[0-9]+).dcm"
-_CONTOUR_FILE_ID_EXTRACTION_RE = "IM-0001-(?P<id>[0-9]+)-icontour-manual.txt"
+_CONTOUR_FILE_ID_EXTRACTION_RE = "IM-0001-(?P<id>[0-9]+)-(i|o)contour-manual.txt"
 
 def extract_dicom_id_from_dicom_filepath(dicom_filepath):
     """Parses the dicom file id from an absolute dicom filepath.

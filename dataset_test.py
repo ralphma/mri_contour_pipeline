@@ -1,5 +1,6 @@
 import collections
-import pytest
+import numpy as np
+import pandas as pd
 
 import dataset
 
@@ -61,4 +62,20 @@ class TestDataset(object):
         assert counter["./test_data/dataset/dicoms/DC-3/100.dcm"] == 25
         assert counter["./test_data/dataset/dicoms/DC-3/100.dcm"] == counter["./test_data/dataset/dicoms/DC-3/101.dcm"]
                 
-            
+    def test_as_panda_dataframe(self):
+        class TestDatapoint(dataset.DataPoint):
+            def __init__(self, id, name):
+                dataset.DataPoint.__init__(self, "a", "b", np.zeros(2), np.zeros(2))
+                self._id = id
+                self._name = name
+
+            def as_pandas_frame(self):
+                """Return the datapoint as a panda data frame."""
+                return pd.DataFrame(data={"name": self._name}, index=[self._id])
+
+        self.dataset.data_points.clear()
+        self.dataset.data_points.append(TestDatapoint(123,"john"))
+        self.dataset.data_points.append(TestDatapoint(345,"adam"))
+        pd_array = self.dataset.as_panda_dataframe()
+        assert np.array_equal(pd_array.index.values, np.array([123, 345]))
+        assert np.array_equal(pd_array.name.values, np.array(["john", "adam"]))
