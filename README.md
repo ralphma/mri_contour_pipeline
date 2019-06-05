@@ -55,7 +55,7 @@ Through unit tests in `dataset_test.py` and `model_input_test.py`. Also ran on t
 ### Given the pipeline you have built, can you see any deficiencies that you would change if you had more time? If not, can you think of any improvements/enhancements to the pipeline that you could build in? ###  
 One improvement I can make is to speed up the batching. Currently, batching is done by iterating one by one through the dataset and stacking the numpy image arrays. Retrieving batch-size chunks from the dataset could be faster if the entire dataset is stored as a single numpy array or a pandas table. I decided to store each pair of images as `DataPoint` to set up an object oriented design so future data point classes can subclass `DataPoint` and override the `is_valid` function. Then `Dataset` can work with different types of `DataPoint`.   
   
-Also in terms of speed, Dataset can use multiple threads for `parse_form_csv` since each (patient_id, original_id) pair can be handled by a different thread. In the code, each thread can run a separate `_add_datapoints_for_patient` with proper locking mechanism on `self._data_points`.   
+Also in terms of speed, `Dataset` can use multiple threads for `parse_form_csv` since each (patient_id, original_id) pair can be handled by a different thread. In the code, each thread can run a separate `_add_datapoints_for_patient` with proper locking mechanism on `self._data_points`. 
   
 # Phase 2 #  
 ## Part 1 ##  
@@ -78,5 +78,4 @@ Finally, if o-contour data is already available, we would want to incorporate it
 | Transfer - Weights/Embeddings trained in a segmentation model can be used for other learning tasks. For instance, if we later want to find the different structures in the heart (object detection), we can reuse intermediate-layers of our segmentation model      | Speed/Resources - Training a deep learning model requires a lot of computation power compare to heuristics. Also, heuristics (such as thresholding) may be much faster during inference time. 
 
 One additional note is that the deep learning model might be harder to debug if something goes wrong. Understanding why a pixel is classified a certain way is much easier with explicit heuristics that can be examined. CNNs are often blackboxes - although there has been a lot recent pushes into model interpretability.
-
 
